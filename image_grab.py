@@ -5,16 +5,24 @@ import time
 import mss
 from directkeys import PressKey, ReleaseKey, W, A, S, D
 
+def roi(img, vertices):
+    mask = np.zeros_like(img)
+    cv2.fillPoly(mask, vertices, 255)
+    masked = cv2.bitwise_and(img, mask)
+    return masked
+
 def process_img(original_image):
     processed_img = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY) # convert to grayscale
     processed_img =  cv2.Canny(processed_img, threshold1 = 200, threshold2=300) # edge detection
-    return processed_img
 
+    vertices = np.array([[0,1300],[0,700],[225,350],[475,350],[700,700],[700,1300]], np.int32)
+    processed_img = roi(processed_img, [vertices])
+    return processed_img
 
 def screen_record(): 
     last_time = time.time()
     while True:
-        screen =  np.array(ImageGrab.grab(bbox=(0,40,700,1600)))
+        screen =  np.array(ImageGrab.grab(bbox=(0,40,700,1300)))
         new_screen = process_img(screen)
 
         print('loop took {} seconds'.format(time.time()-last_time))
@@ -45,19 +53,22 @@ def screen_record_mss():
                 break
 
 def main():
-    #print("Starting screen recording. Press 'q' to stop.")
-    #screen_record_mss()
+    print("Starting screen recording. Press 'q' to stop.")
+    screen_record_mss()
 
+    '''
     # gives us time to get situated in the game
     for i in list(range(4))[::-1]:
         print(i+1)
         time.sleep(1)
 
+    # Press Keys
     print('slide')
     PressKey(D) 
     time.sleep(3)
     print('jump')
     PressKey(A) 
+    '''
 
 if __name__ == "__main__":
     main()
