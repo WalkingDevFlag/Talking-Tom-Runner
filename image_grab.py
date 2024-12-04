@@ -3,6 +3,7 @@ from PIL import ImageGrab
 import cv2
 import time
 import mss
+from directkeys import PressKey, ReleaseKey, W, A, S, D
 
 def process_img(original_image):
     processed_img = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY) # convert to grayscale
@@ -44,8 +45,19 @@ def screen_record_mss():
                 break
 
 def main():
-    print("Starting screen recording. Press 'q' to stop.")
-    screen_record_mss()
+    #print("Starting screen recording. Press 'q' to stop.")
+    #screen_record_mss()
+
+    # gives us time to get situated in the game
+    for i in list(range(4))[::-1]:
+        print(i+1)
+        time.sleep(1)
+
+    print('slide')
+    PressKey(D) 
+    time.sleep(3)
+    print('jump')
+    PressKey(A) 
 
 if __name__ == "__main__":
     main()
