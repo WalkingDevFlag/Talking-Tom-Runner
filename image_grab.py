@@ -3,6 +3,7 @@ from PIL import ImageGrab
 import cv2
 import time
 import mss
+import pyautogui
 from directkeys import PressKey, ReleaseKey, W, A, S, D
 
 def roi(img, vertices):
@@ -54,7 +55,7 @@ def screen_record_mss():
 
 def main():
     print("Starting screen recording. Press 'q' to stop.")
-    screen_record_mss()
+    screen_record()
 
     '''
     # gives us time to get situated in the game
