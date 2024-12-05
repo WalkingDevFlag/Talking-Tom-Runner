@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import win32gui, win32ui, win32con, win32api
+import mss
 
 def grab_screen(region=None):
 
@@ -34,3 +35,25 @@ def grab_screen(region=None):
     win32gui.DeleteObject(bmp.GetHandle())
 
     return cv2.cvtColor(img, cv2.COLOR_BGRA2RGB)
+
+def grab_screen_mss(region=None):
+    with mss.mss() as sct:
+        # Define the region to capture
+        if region:
+            left, top, x2, y2 = region
+            width = x2 - left + 1
+            height = y2 - top + 1
+            monitor = {"top": top, "left": left, "width": width, "height": height}
+        else:
+            monitor = sct.monitors[0]  # Capture the entire primary screen
+
+        # Capture the screen
+        screenshot = sct.grab(monitor)
+
+        # Convert to a NumPy array and reshape to (height, width, 4)
+        img = np.array(screenshot)
+
+        # Convert BGRA to RGB
+        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGRA2RGB)
+
+        return img_rgb
