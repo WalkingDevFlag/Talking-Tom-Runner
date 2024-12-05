@@ -17,13 +17,15 @@ def draw_lines(img, lines):
     except:
         pass
 
-def roi(img, vertices): 
+def roi(img, vertices):
+    
+    #blank mask:
     mask = np.zeros_like(img)   
     
-    # Filling pixels inside the polygon defined by "vertices" with the fill color    
+    #filling pixels inside the polygon defined by "vertices" with the fill color    
     cv2.fillPoly(mask, vertices, 255)
     
-    # Returning the image only where mask pixels are nonzero
+    #returning the image only where mask pixels are nonzero
     masked = cv2.bitwise_and(img, mask)
     return masked
 
@@ -122,12 +124,12 @@ def process_img(image):
     
     processed_img = cv2.GaussianBlur(processed_img,(5,5),0)
     
-    vertices = np.array([[0,1300],[0,700],[225,350],[475,350],[700,700],[700,1300]], np.int32)
+    vertices = np.array([[0,1600],[0,700],[225,350],[475,350],[900,700],[900,1600]], np.int32) # [0,1300],[0,700],[225,350],[475,350],[700,700],[700,1300]
 
     processed_img = roi(processed_img, [vertices])
 
     #                                     rho   theta   thresh  min length, max gap:        
-    lines = cv2.HoughLinesP(processed_img, 1, np.pi/180, 180,      20,       15)
+    lines = cv2.HoughLinesP(processed_img, 1, np.pi/180, 180,      10,       15)
     try:
         l1, l2 = draw_lanes(original_image,lines)
         cv2.line(original_image, (l1[0], l1[1]), (l1[2], l1[3]), [0,255,0], 30)
@@ -168,7 +170,7 @@ def screen_record():
 def screen_record_mss():
     last_time = time.time()
     with mss.mss() as sct:
-        monitor = {"top": 40, "left": 0, "width": 700, "height": 1600}  # Adjust width/height to match the region
+        monitor = {"top": 40, "left": 0, "width": 820, "height": 1600}  # Adjust width/height to match the region
         while True:
             screen = np.array(sct.grab(monitor))
             new_screen, original_image = process_img(screen)
@@ -176,7 +178,7 @@ def screen_record_mss():
             print(f"Loop took {time.time() - last_time:.4f} seconds")
             last_time = time.time()
 
-            cv2.imshow('window2',cv2.cvtColor(original_image, cv2.COLOR_BGRA2BGR))
+            #cv2.imshow('window2',cv2.cvtColor(original_image, cv2.COLOR_BGRA2BGR))
             cv2.imshow('window', cv2.cvtColor(new_screen, cv2.COLOR_BGRA2BGR))
             # Exit the loop when 'q' is pressed
             if cv2.waitKey(25) & 0xFF == ord('q'):
