@@ -1,10 +1,116 @@
 import numpy as np
+from grabscreen import grab_screen
 import cv2
 import time
-import pyautogui
+from getkeys import key_check
+import os
+
+# Updated key mappings
+w = [1, 0, 0, 0, 0]
+s = [0, 1, 0, 0, 0]
+a = [0, 0, 1, 0, 0]
+d = [0, 0, 0, 1, 0]
+n = [0, 0, 0, 0, 1]
+
+def initialize_training_file():
+    """
+    Initialize the training data file by checking if existing files are present.
+    If a file exists, load its data; otherwise, create a new empty list.
+    Returns the starting file name, starting value, and loaded or new training data.
+    """
+    starting_value = 1
+
+    while True:
+        file_name = 'data/training_data-{}.npy'.format(starting_value)
+
+        if os.path.isfile(file_name):
+            print('File exists, moving along', starting_value)
+            starting_value += 1
+        else:
+            print('File does not exist, starting fresh!', starting_value)
+            break
+
+    if os.path.isfile(file_name):
+        print(f"File '{file_name}' exists, loading previous data.")
+        training_data = list(np.load(file_name, allow_pickle=True))  # Load as a list for appending
+    else:
+        print(f"File '{file_name}' does not exist, starting fresh!")
+        training_data = []
+
+    return file_name, starting_value, training_data
+
+def keys_to_output(keys):
+    '''
+    Convert keys to a multi-hot array
+     0  1  2  3  4
+    [W, S, A, D, NOKEY] boolean values.
+    '''
+    output = [0, 0, 0, 0, 0]
+
+    if 'W' in keys:
+        output = w
+    elif 'S' in keys:
+        output = s
+    elif 'A' in keys:
+        output = a
+    elif 'D' in keys:
+        output = d
+    else:
+        output = n
+    return output
+
+def main():
+    file_name, starting_value, training_data = initialize_training_file()
+
+    for i in list(range(4))[::-1]:
+        print(i + 1)
+        time.sleep(1)
+
+    paused = False
+    print('STARTING!!!')
+    while True:
+        if not paused:
+            screen = grab_screen(region=(0, 40, 1920, 1120))
+            # Resize and preprocess screen
+            screen = cv2.resize(screen, (480, 270))
+            screen = cv2.cvtColor(screen, cv2.COLOR_BGR2RGB)
+
+            keys = key_check()
+            output = keys_to_output(keys)
+            training_data.append([screen, output])
+
+            if len(training_data) % 1000 == 0:
+                print(len(training_data))
+
+                if len(training_data) == 10000:
+                    np.save(file_name, np.array(training_data, dtype=object))
+                    print('SAVED')
+                    training_data = []
+                    starting_value += 1
+                    file_name = 'data/training_data-{}.npy'.format(starting_value)
+
+        keys = key_check()
+        if 'T' in keys:
+            if paused:
+                paused = False
+                print('unpaused!')
+                time.sleep(1)
+            else:
+                print('Pausing!')
+                paused = True
+                time.sleep(1)
+
+main()
+
+
+
+
+
+# LEGEND
+'''
 from directkeys import PressKey,ReleaseKey, W, A, S, D
 from draw_lanes import draw_lanes
-from grabscreen import grab_screen
+
 
 def roi(img, vertices):
     mask = np.zeros_like(img)   
@@ -74,8 +180,6 @@ def slow_ya_roll():
     ReleaseKey(D)
 
 
-
-    
 def main():
     for i in list(range(4))[::-1]:
         print(i+1)
@@ -90,6 +194,7 @@ def main():
         #cv2.imshow('window', new_screen)
         cv2.imshow('window2',cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB))
 
+
         if m1 < 0 and m2 < 0:
             right()
         elif m1 > 0  and m2 > 0:
@@ -101,5 +206,5 @@ def main():
         if cv2.waitKey(25) & 0xFF == ord('q'):
             cv2.destroyAllWindows()
             break
-
-main()
+    
+'''
