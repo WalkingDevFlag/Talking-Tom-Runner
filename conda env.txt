@@ -1,0 +1,6 @@
+Conda Env
+1) conda create -n tt python=3.9
+2) conda activate tt
+3) pip install numpy pillow opencv-python ipykernel mss pyautogui statistics
+
+'set PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python'

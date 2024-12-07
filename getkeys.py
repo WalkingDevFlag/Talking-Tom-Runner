@@ -14,3 +14,4 @@ def key_check():
         if wapi.GetAsyncKeyState(ord(key)):
             keys.append(key)
     return keys
+
