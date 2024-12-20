@@ -1,0 +1,5 @@
+1) To restructure the repo in a clean manner
+2) Increase the Dataset by atleast 1000x
+3) Try new model
+4) GO RGB
+5) Increase Resolution
