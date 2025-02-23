@@ -1,0 +1,6 @@
+name: talkingtom
+channels:
+  - defaults
+dependencies:
+  - python=3.9
+prefix: C:\Users\Siddharth\anaconda3\envs\talkingtom
